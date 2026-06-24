@@ -1,0 +1,921 @@
+:root {
+  color-scheme: dark;
+  --bg: #10202a;
+  --bg-2: #183542;
+  --panel: #2d2118;
+  --panel-2: #3d2a1d;
+  --wood: #6d4427;
+  --wood-light: #9e6739;
+  --gold: #f2c14e;
+  --blue: #53b6d8;
+  --ink: #f7ecd2;
+  --muted: #c9b894;
+  --danger: #d55f4f;
+  --ok: #79d48b;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(83, 182, 216, .18), transparent 28%),
+    linear-gradient(180deg, #07151d, var(--bg) 40%, #07141a);
+}
+button, input, textarea { font: inherit; }
+button {
+  border: 1px solid #d89a38;
+  background: linear-gradient(#f2c14e, #b86f25);
+  color: #24170f;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: inset 0 1px rgba(255,255,255,.35), 0 4px 0 #603a20;
+}
+button:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button.danger { background: linear-gradient(#ef8978, #a93a32); color: #fff7ec; border-color: #f3a08d; }
+input, textarea {
+  width: 100%;
+  border: 1px solid rgba(242,193,78,.35);
+  border-radius: 8px;
+  background: rgba(7, 15, 18, .66);
+  color: var(--ink);
+  padding: 10px;
+}
+textarea { min-height: 220px; resize: vertical; margin: 12px 0; font-family: Consolas, monospace; }
+label { display: grid; gap: 8px; color: var(--muted); }
+
+.app-shell { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+.sidebar {
+  position: sticky; top: 0; height: 100vh;
+  padding: 18px;
+  background: linear-gradient(180deg, rgba(45,33,24,.98), rgba(20,36,44,.98));
+  border-right: 2px solid rgba(242,193,78,.22);
+}
+.brand { display: flex; gap: 12px; align-items: center; margin-bottom: 22px; }
+.brand-mark {
+  width: 48px; height: 48px; display: grid; place-items: center;
+  background: #153746; border: 2px solid var(--gold); color: var(--gold);
+  box-shadow: inset 0 0 0 4px rgba(255,255,255,.05);
+  font-weight: 900;
+}
+.brand h1 { margin: 0; font-size: 22px; }
+.brand span, .eyebrow, .empty, .reward-line { color: var(--muted); }
+.sidebar nav { display: grid; gap: 8px; }
+.sidebar nav button {
+  display: flex; gap: 10px; align-items: center; justify-content: flex-start;
+  width: 100%; color: var(--ink); background: rgba(255,255,255,.04);
+  border-color: rgba(242,193,78,.18); box-shadow: none;
+}
+.sidebar nav button.active { background: rgba(83,182,216,.2); border-color: var(--blue); color: white; }
+
+.main { min-width: 0; }
+.topbar {
+  position: sticky; top: 0; z-index: 5;
+  display: grid; grid-template-columns: minmax(220px, 380px) 1fr; gap: 18px;
+  align-items: center; padding: 14px 22px;
+  background: rgba(9, 22, 28, .92);
+  border-bottom: 1px solid rgba(242,193,78,.18);
+  backdrop-filter: blur(10px);
+}
+.resources { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.resources span, .pill {
+  border: 1px solid rgba(242,193,78,.22);
+  background: rgba(255,255,255,.06);
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.page { padding: 22px; display: grid; gap: 20px; }
+.section-head, .card-head, .button-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+h2, h3, p { margin-top: 0; }
+h2 { font-size: 24px; margin-bottom: 14px; }
+h3 { font-size: 18px; margin-bottom: 8px; }
+p { line-height: 1.45; }
+
+.card, .hero-panel, .event-banner {
+  border: 1px solid rgba(242,193,78,.24);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.05), transparent 35%),
+    linear-gradient(180deg, rgba(61,42,29,.96), rgba(32,26,21,.96));
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: 0 12px 32px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.04);
+}
+.hero-panel, .event-banner {
+  display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(240px, .8fr);
+  min-height: 260px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(13, 58, 76, .85), rgba(28, 24, 19, .92)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 2px, transparent 2px 18px);
+}
+.hero-panel h2, .event-banner h2 { font-size: 42px; margin-bottom: 8px; }
+.hero-ship, .ship-portrait { display: grid; place-items: center; min-height: 190px; }
+.big-ship, .pixel-ship, .ship-sprite, .pixel-icon, .map-tile, .ice-crystal {
+  image-rendering: pixelated;
+  border: 2px solid rgba(255,255,255,.16);
+}
+.big-ship {
+  width: min(330px, 80%); height: 110px;
+  clip-path: polygon(8% 38%, 72% 38%, 92% 58%, 80% 84%, 18% 84%);
+  background: linear-gradient(90deg, #7b4a2a, #d28a42 50%, #51301d);
+  position: relative;
+}
+.big-ship::before {
+  content: ""; position: absolute; left: 40%; bottom: 42%; width: 8px; height: 95px; background: #d8b16d;
+  box-shadow: 34px 18px 0 -2px #d8b16d;
+}
+.big-ship::after {
+  content: ""; position: absolute; left: 43%; bottom: 75%; width: 78px; height: 52px;
+  background: linear-gradient(135deg, #f7ecd2 0 50%, #53b6d8 50%);
+  clip-path: polygon(0 0, 100% 22%, 20% 100%);
+}
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stats-row.compact { grid-template-columns: repeat(3, 1fr); margin-top: 14px; }
+.stat-card {
+  background: rgba(9, 18, 22, .55);
+  border: 1px solid rgba(83,182,216,.22);
+  border-radius: 8px;
+  padding: 14px;
+}
+.stat-card span { display: block; color: var(--muted); font-size: 13px; }
+.stat-card strong { font-size: 22px; color: var(--gold); }
+.grid.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+
+.progress-wrap { display: grid; gap: 5px; margin: 8px 0; }
+.progress-label { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 13px; }
+.progress { height: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,.15); border-radius: 999px; background: rgba(0,0,0,.35); }
+.progress span { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), var(--gold)); }
+
+.ship-grid, .map-grid, .quest-grid, .equipment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
+.equipment-grid.slim { grid-template-columns: 1fr; }
+.ship-card.locked, .map-card.locked { filter: grayscale(.75); opacity: .72; }
+.ship-card .pixel-ship {
+  width: 100%; height: 82px; margin-bottom: 12px;
+  background: linear-gradient(#245264 0 42%, #7a4a2b 43% 74%, #332018 75%);
+  clip-path: polygon(8% 30%, 78% 30%, 96% 58%, 80% 82%, 18% 82%);
+}
+.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 12px 0; }
+.stat-grid.small { font-size: 14px; }
+.stat-grid span { background: rgba(0,0,0,.22); padding: 8px; border-radius: 6px; color: var(--muted); }
+.stat-grid b { color: var(--ink); float: right; }
+.positive { color: var(--ok); }
+.negative { color: var(--danger); }
+
+.map-card.selected { outline: 2px solid var(--blue); }
+.map-tile {
+  height: 88px; margin-bottom: 12px; border-radius: 6px;
+  background:
+    linear-gradient(135deg, transparent 45%, rgba(242,193,78,.35) 45% 52%, transparent 52%),
+    repeating-linear-gradient(0deg, #174e65 0 10px, #1f6a84 10px 20px);
+}
+.combat-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr); gap: 18px; }
+.battle-ocean {
+  height: 300px;
+  border-radius: 8px;
+  border: 1px solid rgba(83,182,216,.25);
+  background: repeating-linear-gradient(0deg, #123b4b 0 16px, #174f63 16px 32px);
+  position: relative; overflow: hidden; margin-bottom: 14px;
+}
+.ship-sprite {
+  position: absolute; width: 120px; height: 54px; bottom: 70px;
+  clip-path: polygon(0 35%, 76% 35%, 100% 62%, 82% 88%, 14% 88%);
+  background: #b56e36;
+}
+.ship-sprite.player { left: 12%; }
+.ship-sprite.enemy { right: 12%; transform: scaleX(-1); background: #875039; }
+.combat-log { max-height: 300px; overflow: auto; display: grid; gap: 8px; }
+.combat-log p { margin: 0; padding: 8px; background: rgba(0,0,0,.22); border-radius: 6px; }
+
+.equipment-card { display: grid; grid-template-columns: 58px 1fr; gap: 12px; align-items: start; }
+.pixel-icon {
+  width: 46px; height: 46px; border-radius: 6px;
+  background: linear-gradient(135deg, #b7c2bd, #5e6b65);
+}
+.rarity-common { background: linear-gradient(135deg, #c9c1aa, #77705e); }
+.rarity-uncommon { background: linear-gradient(135deg, #81d48f, #2d7246); }
+.rarity-rare { background: linear-gradient(135deg, #53b6d8, #234f91); }
+.rarity-epic { background: linear-gradient(135deg, #c07eea, #653089); }
+.rarity-legendary { background: linear-gradient(135deg, #f2c14e, #b54d22); }
+.rarity-event { background: linear-gradient(135deg, #e7fbff, #57bddd); }
+.shop-section { display: grid; gap: 12px; }
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+.shop-item {
+  background: rgba(0,0,0,.2);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+}
+.quest-card.complete, .achievement.complete { border-color: rgba(121,212,139,.55); background: rgba(38, 92, 55, .28); }
+.achievement-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.achievement { display: grid; gap: 4px; padding: 12px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: rgba(0,0,0,.2); }
+.achievement span { color: var(--muted); }
+.event-banner { background: linear-gradient(135deg, rgba(13,58,76,.95), rgba(45,33,24,.96)); }
+.ice-crystal {
+  place-self: center; display: grid; place-items: center; text-align: center;
+  width: 210px; height: 210px; padding: 20px;
+  clip-path: polygon(50% 0, 82% 18%, 100% 50%, 82% 82%, 50% 100%, 18% 82%, 0 50%, 18% 18%);
+  background: linear-gradient(135deg, #e7fbff, #57bddd 55%, #1d6986);
+  color: #08202b; font-weight: 900; font-size: 22px;
+}
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 20;
+  display: grid; place-items: center;
+  background: rgba(0,0,0,.62);
+}
+.modal { max-width: 460px; width: calc(100% - 32px); }
+
+@media (max-width: 900px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+  .sidebar nav { grid-template-columns: repeat(2, 1fr); }
+  .topbar, .hero-panel, .event-banner, .grid.two, .combat-layout { grid-template-columns: 1fr; }
+  .resources { justify-content: flex-start; }
+  .hero-panel h2, .event-banner h2 { font-size: 32px; }
+}
+
+@media (max-width: 560px) {
+  .page, .topbar, .sidebar { padding: 12px; }
+  .sidebar nav { grid-template-columns: 1fr; }
+  .stats-row.compact, .stat-grid { grid-template-columns: 1fr; }
+  button { width: 100%; }
+}
+
+/* Immersive scene overhaul */
+body {
+  background:
+    linear-gradient(180deg, rgba(4, 18, 25, .95), rgba(12, 39, 45, .9) 36%, rgba(22, 18, 15, .96)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 18px);
+  overflow-x: hidden;
+}
+
+button, .resource-chip, .sidebar nav button, .shop-item, .ship-card, .quest-card {
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+button:hover:not(:disabled), .resource-chip:hover, .shop-item:hover, .ship-card:hover, .quest-card:hover {
+  transform: translateY(-2px);
+}
+
+select {
+  border: 1px solid rgba(242,193,78,.35);
+  border-radius: 8px;
+  background: rgba(7, 15, 18, .78);
+  color: var(--ink);
+  padding: 10px;
+}
+
+.sidebar {
+  background:
+    linear-gradient(180deg, rgba(38, 23, 16, .98), rgba(21, 49, 53, .95)),
+    repeating-linear-gradient(90deg, rgba(130, 82, 43, .2) 0 11px, rgba(63, 37, 22, .25) 11px 22px);
+}
+
+.brand-mark {
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 50% 25%, rgba(242,193,78,.28), transparent 38%),
+    #102e38;
+}
+
+.sidebar nav button {
+  min-height: 46px;
+  background: rgba(9, 18, 22, .34);
+  border-color: rgba(242,193,78,.15);
+}
+
+.sidebar nav button:hover:not(.active) {
+  border-color: rgba(242,193,78,.5);
+  box-shadow: inset 3px 0 rgba(242,193,78,.55);
+}
+
+.sidebar nav button.active {
+  background: linear-gradient(90deg, rgba(31, 101, 117, .72), rgba(95, 58, 35, .52));
+  border-color: rgba(242,193,78,.75);
+  box-shadow: 0 0 18px rgba(83,182,216,.18), inset 3px 0 var(--gold);
+}
+
+.nav-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(242,193,78,.32);
+  border-radius: 7px;
+  color: var(--gold);
+  background: rgba(0,0,0,.22);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.sidebar-collapse {
+  width: 100%;
+  margin-top: 18px;
+  background: rgba(8, 17, 21, .48);
+  color: var(--muted);
+  border-color: rgba(242,193,78,.2);
+  box-shadow: none;
+}
+
+.topbar {
+  grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+  background:
+    linear-gradient(180deg, rgba(9, 22, 28, .94), rgba(30, 20, 15, .88)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 2px, transparent 2px 16px);
+}
+
+.captain-strip strong {
+  display: block;
+  color: #fff7df;
+  margin-bottom: 4px;
+}
+
+.resources {
+  gap: 9px;
+}
+
+.resource-chip {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  column-gap: 7px;
+  align-items: center;
+  min-width: 92px;
+  border-radius: 8px;
+  background: rgba(7, 14, 17, .54);
+}
+
+.resource-chip b {
+  grid-row: 1 / 3;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #21150e;
+  background: var(--gold);
+  font-size: 10px;
+}
+
+.resource-chip small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.scene {
+  position: relative;
+  min-height: calc(100vh - 77px);
+  padding: 28px;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #08202a;
+}
+
+.scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -4;
+  background:
+    linear-gradient(180deg, rgba(76, 132, 142, .45), rgba(13, 53, 68, .58) 38%, rgba(35, 23, 17, .86)),
+    radial-gradient(circle at 80% 14%, rgba(246, 211, 132, .24), transparent 16%),
+    repeating-linear-gradient(0deg, rgba(14, 76, 94, .35) 0 18px, rgba(11, 58, 76, .35) 18px 36px);
+}
+
+.scene::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 33%;
+  z-index: -3;
+  background:
+    radial-gradient(ellipse at 20% 95%, rgba(107, 70, 37, .62), transparent 34%),
+    repeating-linear-gradient(0deg, rgba(13, 83, 101, .34) 0 13px, rgba(24, 113, 132, .28) 13px 26px);
+  animation: wavesMove 11s linear infinite;
+}
+
+.scene-ship::before, .scene-cabin::before, .scene-settings::before {
+  background:
+    linear-gradient(180deg, rgba(36, 23, 18, .94), rgba(70, 43, 25, .88)),
+    repeating-linear-gradient(90deg, rgba(143, 87, 45, .3) 0 16px, rgba(55, 31, 19, .35) 16px 32px);
+}
+
+.scene-battle::before, .scene-map::before {
+  background:
+    linear-gradient(180deg, rgba(84, 139, 151, .55), rgba(11, 55, 76, .82) 44%, rgba(8, 31, 45, .9)),
+    radial-gradient(circle at 12% 20%, rgba(246, 211, 132, .22), transparent 15%);
+}
+
+.scene-shipyard::before {
+  background:
+    linear-gradient(180deg, rgba(48, 70, 69, .82), rgba(79, 47, 25, .9)),
+    repeating-linear-gradient(90deg, rgba(154, 94, 46, .26) 0 18px, rgba(38, 25, 18, .3) 18px 36px);
+}
+
+.scene-market::before {
+  background:
+    linear-gradient(180deg, rgba(59, 92, 86, .72), rgba(90, 48, 32, .86)),
+    radial-gradient(circle at 75% 18%, rgba(196, 67, 54, .24), transparent 14%);
+}
+
+.scene-tavern::before {
+  background:
+    linear-gradient(180deg, rgba(42, 22, 15, .95), rgba(86, 49, 27, .9)),
+    radial-gradient(circle at 18% 12%, rgba(242,193,78,.2), transparent 18%);
+}
+
+.scene-festival::before {
+  background:
+    linear-gradient(180deg, rgba(97, 139, 151, .65), rgba(24, 82, 101, .82), rgba(42, 28, 36, .86)),
+    radial-gradient(circle at 80% 12%, rgba(230, 251, 255, .36), transparent 15%);
+}
+
+.scene-layer {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.clouds {
+  background:
+    radial-gradient(ellipse at 18% 16%, rgba(255,255,255,.28), transparent 13%),
+    radial-gradient(ellipse at 58% 9%, rgba(255,255,255,.22), transparent 12%),
+    radial-gradient(ellipse at 90% 20%, rgba(255,255,255,.18), transparent 15%);
+  animation: cloudDrift 36s linear infinite;
+}
+
+.fog {
+  background:
+    linear-gradient(90deg, transparent, rgba(231, 228, 203, .09), transparent),
+    linear-gradient(270deg, transparent, rgba(231, 228, 203, .07), transparent);
+  animation: fogDrift 22s ease-in-out infinite alternate;
+}
+
+.waves {
+  top: auto;
+  height: 28%;
+  background: repeating-linear-gradient(0deg, rgba(86, 180, 199, .12) 0 5px, transparent 5px 18px);
+  animation: wavesMove 8s linear infinite;
+}
+
+.scene-header, .scene-content {
+  position: relative;
+  z-index: 1;
+}
+
+.scene-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.scene-header h2 {
+  margin: 0;
+  font-size: 42px;
+  text-shadow: 0 3px 16px rgba(0,0,0,.55);
+}
+
+.scene-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.scene-content {
+  display: grid;
+  gap: 18px;
+}
+
+.harbour-hero, .ship-showcase-panel {
+  display: grid;
+  grid-template-columns: minmax(0, .95fr) minmax(320px, 1.05fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+.harbour-hero > div:first-child, .ship-showcase-panel {
+  border: 1px solid rgba(242,193,78,.26);
+  border-radius: 8px;
+  padding: 20px;
+  background: rgba(28, 21, 17, .62);
+  box-shadow: 0 18px 38px rgba(0,0,0,.28);
+}
+
+.harbour-stage, .ship-portrait {
+  position: relative;
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(83,182,216,.28);
+  background:
+    linear-gradient(180deg, rgba(91, 145, 151, .35), rgba(13, 73, 88, .66) 55%, rgba(61, 37, 22, .88)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0 2px, transparent 2px 20px);
+}
+
+.harbour-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.big-ship.showcase {
+  animation: shipBob 4.5s ease-in-out infinite;
+  filter: drop-shadow(0 22px 22px rgba(0,0,0,.42));
+}
+
+.dock-post {
+  position: absolute;
+  bottom: 0;
+  width: 30px;
+  height: 210px;
+  background: linear-gradient(90deg, #392215, #90603b, #392215);
+}
+
+.dock-post.left { left: 12%; }
+.dock-post.right { right: 13%; }
+
+.lantern {
+  position: absolute;
+  top: 36px;
+  right: 22%;
+  width: 22px;
+  height: 34px;
+  border: 2px solid rgba(40, 24, 13, .9);
+  border-radius: 6px;
+  background: rgba(242,193,78,.78);
+  box-shadow: 0 0 26px rgba(242,193,78,.45);
+  animation: lanternFlicker 1.9s ease-in-out infinite;
+}
+
+.quick-actions, .inventory-tools, .event-meta, .inventory-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ship-showcase-panel {
+  background:
+    linear-gradient(135deg, rgba(23, 54, 54, .64), rgba(46, 27, 18, .78)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, transparent 1px 14px);
+}
+
+.slot-row {
+  display: grid;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.slot-row > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.slot {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  border: 1px dashed rgba(242,193,78,.28);
+  color: rgba(247,236,210,.5);
+  background: rgba(0,0,0,.18);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.slot.filled {
+  color: #21150e;
+  background: linear-gradient(135deg, #f2c14e, #5eb8c7);
+  border-style: solid;
+}
+
+.drydock-intro {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(242,193,78,.24);
+  border-radius: 8px;
+  background: rgba(35, 24, 18, .58);
+}
+
+.dock-crane {
+  width: 80px;
+  height: 80px;
+  border-left: 8px solid #8f5f36;
+  border-top: 8px solid #8f5f36;
+  transform: skewX(-12deg);
+}
+
+.ship-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.ship-banner {
+  position: absolute;
+  top: 12px;
+  right: -46px;
+  width: 180px;
+  transform: rotate(34deg);
+  text-align: center;
+  padding: 5px;
+  background: rgba(10, 26, 31, .9);
+  color: var(--gold);
+  border: 1px solid rgba(242,193,78,.4);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.ship-card.current {
+  border-color: rgba(242,193,78,.78);
+  box-shadow: 0 0 28px rgba(242,193,78,.13), inset 0 0 0 1px rgba(242,193,78,.15);
+}
+
+.map-card {
+  min-height: 355px;
+}
+
+.map-card:not(.locked) .map-tile {
+  box-shadow: 0 0 22px rgba(83,182,216,.24);
+}
+
+.map-card.selected .map-tile {
+  box-shadow: 0 0 28px rgba(242,193,78,.34);
+}
+
+.zone-details {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.zone-details span {
+  display: grid;
+  gap: 3px;
+  padding: 8px;
+  border-radius: 6px;
+  background: rgba(0,0,0,.2);
+  color: var(--muted);
+}
+
+.zone-details b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.map-tile {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 34%, rgba(226, 197, 107, .9) 0 9%, transparent 10%),
+    radial-gradient(circle at 70% 72%, rgba(44, 112, 79, .82) 0 8%, transparent 9%),
+    repeating-linear-gradient(0deg, #0e5367 0 10px, #176a7f 10px 20px);
+}
+
+.map-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 45%, rgba(255,255,255,.18), transparent 58%);
+  transform: translateX(-100%);
+  animation: chartGlow 8s ease-in-out infinite;
+}
+
+.market-stall {
+  background:
+    linear-gradient(180deg, rgba(73, 42, 26, .92), rgba(30, 24, 19, .96)),
+    repeating-linear-gradient(90deg, rgba(178, 38, 44, .08) 0 18px, rgba(242,193,78,.06) 18px 36px);
+}
+
+.stall-sign {
+  color: var(--gold);
+  font-weight: 800;
+}
+
+.quest-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 16px;
+  padding: 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(242,193,78,.25);
+  background:
+    linear-gradient(180deg, rgba(78, 45, 24, .72), rgba(40, 25, 17, .78)),
+    repeating-linear-gradient(90deg, rgba(139, 83, 43, .35) 0 18px, rgba(57, 34, 21, .36) 18px 36px);
+}
+
+.quest-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(247, 222, 170, .92), rgba(184, 128, 70, .9));
+  color: #2d1a10;
+  transform: rotate(-.4deg);
+}
+
+.quest-card:nth-child(even) {
+  transform: rotate(.45deg);
+}
+
+.quest-card h3, .quest-card .reward-line, .quest-card .progress-label {
+  color: #2d1a10;
+}
+
+.pin {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #9c2832;
+  box-shadow: 0 2px 5px rgba(0,0,0,.35);
+}
+
+.quest-card.claimable {
+  animation: questReady 1.8s ease-in-out infinite;
+}
+
+.achievement-wall {
+  background: rgba(38, 22, 15, .72);
+}
+
+.treasure-row .stat-card {
+  background:
+    linear-gradient(180deg, rgba(86, 52, 25, .72), rgba(22, 19, 15, .76));
+}
+
+.inventory-controls label {
+  width: min(240px, 100%);
+}
+
+.battle-ocean.active .projectile {
+  animation: cannonShot 2.3s linear infinite;
+}
+
+.battle-ocean.active .cannon-flash {
+  animation: cannonFlash 2.3s ease-in-out infinite;
+}
+
+.battle-ocean.active .ship-sprite {
+  animation: shipBob 3.4s ease-in-out infinite;
+}
+
+.cannon-flash {
+  position: absolute;
+  right: -8px;
+  top: 20px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(242,193,78,.9);
+  opacity: 0;
+  box-shadow: 0 0 20px rgba(242,193,78,.8);
+}
+
+.projectile {
+  position: absolute;
+  left: 25%;
+  bottom: 112px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1a100c;
+  opacity: 0;
+}
+
+.damage-number {
+  position: absolute;
+  top: -26px;
+  left: 30%;
+  color: #ffd36a;
+  font-weight: 900;
+  text-shadow: 0 2px 8px rgba(0,0,0,.7);
+}
+
+.ship-sprite.sinking {
+  transform: scaleX(-1) rotate(7deg) translateY(16px);
+  opacity: .65;
+}
+
+.victory-line {
+  border-color: rgba(121,212,139,.34);
+  color: #d6ffd9;
+}
+
+.event-reward {
+  border-color: rgba(231,251,255,.32);
+}
+
+@keyframes cloudDrift {
+  from { transform: translateX(-2%); }
+  to { transform: translateX(4%); }
+}
+
+@keyframes fogDrift {
+  from { opacity: .35; transform: translateX(-3%); }
+  to { opacity: .62; transform: translateX(3%); }
+}
+
+@keyframes wavesMove {
+  from { background-position: 0 0; }
+  to { background-position: 0 52px; }
+}
+
+@keyframes shipBob {
+  0%, 100% { transform: translateY(0) rotate(-.4deg); }
+  50% { transform: translateY(-8px) rotate(.5deg); }
+}
+
+@keyframes lanternFlicker {
+  0%, 100% { opacity: .78; box-shadow: 0 0 18px rgba(242,193,78,.35); }
+  45% { opacity: 1; box-shadow: 0 0 30px rgba(242,193,78,.62); }
+  70% { opacity: .68; }
+}
+
+@keyframes chartGlow {
+  0%, 70% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes questReady {
+  0%, 100% { box-shadow: 0 12px 32px rgba(0,0,0,.28); }
+  50% { box-shadow: 0 12px 32px rgba(0,0,0,.28), 0 0 22px rgba(121,212,139,.28); }
+}
+
+@keyframes cannonShot {
+  0%, 38% { opacity: 0; transform: translate(0, 0); }
+  42% { opacity: 1; }
+  60% { opacity: 1; transform: translate(44vw, -18px); }
+  64%, 100% { opacity: 0; transform: translate(44vw, -18px); }
+}
+
+@keyframes cannonFlash {
+  0%, 38%, 52%, 100% { opacity: 0; transform: scale(.4); }
+  42% { opacity: 1; transform: scale(1.4); }
+}
+
+@media (max-width: 1180px) {
+  .topbar {
+    grid-template-columns: 1fr;
+  }
+  .resources {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 900px) {
+  .scene {
+    min-height: auto;
+    padding: 16px;
+  }
+  .scene-header h2 {
+    font-size: 34px;
+  }
+  .harbour-hero, .ship-showcase-panel {
+    grid-template-columns: 1fr;
+  }
+  .harbour-metrics {
+    grid-template-columns: 1fr;
+  }
+  .sidebar-collapse {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .scene {
+    padding: 12px;
+  }
+  .resource-chip {
+    min-width: calc(50% - 6px);
+  }
+  .scene-header {
+    align-items: stretch;
+  }
+  .scene-actions, .quick-actions, .inventory-tools, .event-meta, .inventory-controls {
+    width: 100%;
+  }
+  .harbour-stage, .ship-portrait {
+    min-height: 220px;
+  }
+}
