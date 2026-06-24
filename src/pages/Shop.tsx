@@ -7,9 +7,9 @@ import { fmt } from '../utils/economy';
 
 export default function Shop({ actions }: PageProps) {
   const sections = [
-    { title: 'Cannons', items: cannons.filter((x) => x.price > 0).slice(0, 6), type: 'cannon' as const },
-    { title: 'Harpoons', items: harpoons.filter((x) => x.price > 0).slice(0, 5), type: 'harpoon' as const },
-    { title: 'Decks', items: decks.filter((x) => x.price > 0).slice(0, 5), type: 'deck' as const },
+    { title: 'Cannons', items: cannons, type: 'cannon' as const },
+    { title: 'Harpoons', items: harpoons, type: 'harpoon' as const },
+    { title: 'Decks', items: decks, type: 'deck' as const },
   ];
   return (
     <SceneLayout scene="market" title="Shop" kicker="Pirate market" actions={<span className="pill">No real-money purchases</span>}>
@@ -22,7 +22,7 @@ export default function Shop({ actions }: PageProps) {
                 <div className={`pixel-icon rarity-${item.rarity.toLowerCase()}`} />
                 <h3>{item.name}</h3>
                 <p>{item.rarity}</p>
-                <button onClick={() => actions.buyEquipment(item.id, section.type)}>Buy {fmt(item.price)}</button>
+                {item.locked ? <button disabled>Coming In Future Updates</button> : ['rusty-cannon', 'wooden-harpoon', 'beech-deck'].includes(item.id) || item.rarity === 'Event' ? <button disabled={item.price <= 0} onClick={() => actions.buyEquipment(item.id, section.type)}>Buy {fmt(item.price)}</button> : <button disabled>Unlock By Evolution</button>}
               </article>
             ))}
           </div>

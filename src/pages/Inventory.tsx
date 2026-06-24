@@ -17,6 +17,9 @@ export default function Inventory({ state, actions }: PageProps) {
         <div className="stat-card"><span>Cloth</span><strong>{fmt(state.materials.cloth)}</strong></div>
         <div className="stat-card"><span>Gunpowder</span><strong>{fmt(state.materials.gunpowder)}</strong></div>
         <div className="stat-card"><span>Ancient Relics</span><strong>{fmt(state.materials.relics)}</strong></div>
+        <div className="stat-card"><span>Ghost Essence</span><strong>{fmt(state.materials.ghostEssence)}</strong></div>
+        <div className="stat-card"><span>Leviathan Hearts</span><strong>{fmt(state.materials.leviathanHeart)}</strong></div>
+        <div className="stat-card"><span>Kraken Eyes</span><strong>{fmt(state.materials.krakenEye)}</strong></div>
       </div>
       <InventoryPanel state={state} onEquip={actions.equipEquipment} onUpgrade={actions.upgradeEquipment} />
       {!state.inventory.length && <p className="empty">No event trinkets yet. Festival currencies and future cosmetics will appear here.</p>}

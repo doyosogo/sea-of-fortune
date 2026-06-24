@@ -1,9 +1,10 @@
 import { enemies } from '../data/enemies';
 import { frozenFestival } from '../data/events';
+import { lootTables } from '../data/loot';
 import { zones } from '../data/zones';
 import { Enemy, GameState, Zone } from '../types/game';
 import { addMaterials } from './economy';
-import { gainXp, getPower } from './progression';
+import { gainXp, getPower, makeEquipment } from './progression';
 
 export const allZones: Zone[] = [...zones, frozenFestival.zone as Zone];
 
@@ -26,20 +27,38 @@ export const defeatEnemy = (state: GameState, enemy: Enemy, zoneId: string) => {
   for (const material of zone.materialDrops) {
     materials[material] = (materials[material] ?? 0) + Math.max(1, Math.floor(zone.requiredLevel / 3));
   }
+  if (zone.requiredLevel >= 22 && Math.random() < 0.001) materials.relics = (materials.relics ?? 0) + 1;
+  if (zone.id === 'ghostwater-abyss' && Math.random() < 0.0005) materials.ghostEssence = (materials.ghostEssence ?? 0) + 1;
+  if ((enemy.id.includes('leviathan') || enemy.boss) && Math.random() < 0.0005) materials.leviathanHeart = (materials.leviathanHeart ?? 0) + 1;
+  const lootTable = zone.requiredLevel >= 35 ? lootTables.ghost : zone.requiredLevel >= 18 ? lootTables.storm : lootTables.early;
+  const rareDrop = lootTable.find((entry) => Math.random() < entry.chance);
+  const equipment = rareDrop && rareDrop.kind !== 'inventory' ? [makeEquipment(rareDrop.id, rareDrop.kind)] : [];
+  const inventory = rareDrop?.kind === 'inventory' ? [rareDrop.id] : [];
   let next = {
     ...state,
     gold: state.gold + gold,
     materials: addMaterials(state.materials, materials),
+    equipment: [...state.equipment, ...equipment],
+    inventory: [...state.inventory, ...inventory],
+    discovered: {
+      ...state.discovered,
+      enemies: Array.from(new Set([...state.discovered.enemies, enemy.id])),
+      materials: Array.from(new Set([...state.discovered.materials, ...Object.keys(materials)])) as GameState['discovered']['materials'],
+      cannons: Array.from(new Set([...state.discovered.cannons, ...equipment.filter((item) => item.type === 'cannon').map((item) => item.baseId)])),
+      harpoons: Array.from(new Set([...state.discovered.harpoons, ...equipment.filter((item) => item.type === 'harpoon').map((item) => item.baseId)])),
+      decks: Array.from(new Set([...state.discovered.decks, ...equipment.filter((item) => item.type === 'deck').map((item) => item.baseId)])),
+    },
     eventCurrency: zoneId === frozenFestival.zone.id ? { ...state.eventCurrency, [frozenFestival.id]: (state.eventCurrency[frozenFestival.id] ?? 0) + (enemy.boss ? 10 : 3) } : state.eventCurrency,
     stats: {
       ...state.stats,
       enemiesDefeated: state.stats.enemiesDefeated + 1,
       bossesDefeated: state.stats.bossesDefeated + (enemy.boss ? 1 : 0),
       goldEarned: state.stats.goldEarned + gold,
+      rareDropsFound: state.stats.rareDropsFound + (rareDrop ? 1 : 0),
     },
   };
   next = gainXp(next, xp);
-  return { state: next, rewards: { gold, xp, materials } };
+  return { state: next, rewards: { gold, xp, materials, rareDrop } };
 };
 
 export const repairCost = (state: GameState) => {

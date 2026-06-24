@@ -18,7 +18,7 @@ export default function Dashboard({ state, actions, setPage }: PageProps) {
   return (
     <SceneLayout
       scene="harbour"
-      title="Harbour"
+      title="Sea of Fortune"
       kicker="Captain's harbour"
       actions={<><button onClick={actions.startSailing}>Continue Sailing</button><button onClick={actions.repair}>Repair Ship</button></>}
     >
@@ -32,6 +32,8 @@ export default function Dashboard({ state, actions, setPage }: PageProps) {
             <StatCard label="Gold / Hour" value={fmt(Math.max(1, power.damage * 30))} />
             <StatCard label="XP / Hour" value={fmt(Math.max(1, state.level * 42))} />
             <StatCard label="Active Zone" value={zone?.name ?? 'Festival Waters'} />
+            <StatCard label="Rare Drops" value={state.stats.rareDropsFound} />
+            <StatCard label="Hours Played" value={fmt((Date.now() - state.stats.startedAt) / 3600000)} />
           </div>
         </div>
         <div className="harbour-stage">

@@ -3,7 +3,7 @@ import EquipmentCard from './EquipmentCard';
 import { GameState, OwnedEquipment } from '../types/game';
 import { getBaseEquipment } from '../utils/economy';
 
-const rarityRank = { Common: 1, Uncommon: 2, Rare: 3, Epic: 4, Legendary: 5, Event: 6 };
+const rarityRank = { Common: 1, Uncommon: 2, Rare: 3, Epic: 4, Legendary: 5, Event: 6, Mythic: 7 };
 
 export default function InventoryPanel({ state, onEquip, onUpgrade }: { state: GameState; onEquip: (id: string) => void; onUpgrade: (id: string) => void }) {
   const [filter, setFilter] = useState<'all' | OwnedEquipment['type']>('all');

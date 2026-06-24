@@ -1,7 +1,7 @@
 import { Page } from '../types/game';
 
-const pages: Page[] = ['Dashboard', 'My Ship', 'Sea Map', 'Combat', 'Shipyard', 'Shop', 'Quests', 'Inventory', 'Events', 'Settings'];
-const icons = ['HB', 'SH', 'MP', 'CB', 'YD', 'MK', 'QT', 'IN', 'EV', 'ST'];
+const pages: Page[] = ['Dashboard', 'My Ship', 'Sea Map', 'Combat', 'Shipyard', 'Shop', 'Quests', 'Inventory', 'Collections', 'Crew', 'Expeditions', 'Events', 'Settings'];
+const icons = ['HB', 'SH', 'MP', 'CB', 'YD', 'MK', 'QT', 'IN', 'CO', 'CR', 'EX', 'EV', 'ST'];
 
 export default function Sidebar({ page, setPage }: { page: Page; setPage: (page: Page) => void }) {
   return (
@@ -9,8 +9,8 @@ export default function Sidebar({ page, setPage }: { page: Page; setPage: (page:
       <div className="brand">
         <div className="brand-mark">ST</div>
         <div>
-          <h1>Sea of Treasure</h1>
-          <span>Captain's idle log</span>
+          <h1 className="logo-text">Sea of Fortune</h1>
+          <span>Idle Naval RPG</span>
         </div>
       </div>
       <nav>

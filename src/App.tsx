@@ -3,8 +3,10 @@ import type { ReactElement } from 'react';
 import Layout from './components/Layout';
 import { achievements } from './data/achievements';
 import { cannons } from './data/cannons';
+import { crewMembers } from './data/crew';
 import { decks } from './data/decks';
 import { frozenFestival } from './data/events';
+import { expeditions } from './data/expeditions';
 import { harpoons } from './data/harpoons';
 import { quests } from './data/quests';
 import { ships } from './data/ships';
@@ -13,9 +15,13 @@ import { defeatEnemy, offlineRewards, repairCost, spawnEnemy } from './utils/com
 import { addMaterials, canAffordMaterials, spendMaterials, upgradeCost } from './utils/economy';
 import { applyRewards, claimAvailableAchievements, createInitialState, getCurrentShip, getPower, makeEquipment } from './utils/progression';
 import { exportSave, importSave, loadGame, resetSave, saveGame } from './utils/saveSystem';
+import { nextEvolution } from './data/equipmentEvolution';
 import CombatPage from './pages/Combat';
+import Collections from './pages/Collections';
+import Crew from './pages/Crew';
 import Dashboard from './pages/Dashboard';
 import Events from './pages/Events';
+import Expeditions from './pages/Expeditions';
 import Inventory from './pages/Inventory';
 import MyShip from './pages/MyShip';
 import Quests from './pages/Quests';
@@ -39,6 +45,8 @@ export interface GameActions {
   claimQuest: (id: string) => void;
   claimAchievements: () => void;
   buyEventItem: (id: string) => void;
+  startExpedition: (id: string) => void;
+  claimExpedition: (instanceId: string) => void;
   save: () => void;
   load: () => void;
   reset: () => void;
@@ -103,7 +111,8 @@ export default function App() {
             nextState = claimAvailableAchievements({ ...result.state, questProgress });
             sessionGold += result.rewards.gold;
             sessionXp += result.rewards.xp;
-            log = [`Defeated ${currentEnemy.name}: +${result.rewards.gold} gold, +${result.rewards.xp} XP.`, ...log].slice(0, 18);
+            const rareLine = result.rewards.rareDrop ? `${result.rewards.rareDrop.rarity.toUpperCase()} DROP! ${result.rewards.rareDrop.id}` : null;
+            log = [rareLine, `Defeated ${currentEnemy.name}: +${result.rewards.gold} gold, +${result.rewards.xp} XP.`, ...log].filter(Boolean).slice(0, 18) as string[];
             nextEnemy = spawnEnemy(nextState.selectedZoneId, (nextState.stats.enemiesDefeated + 1) % 12 === 0);
             enemyHp = nextEnemy.hp;
           }
@@ -136,13 +145,20 @@ export default function App() {
     buyShip: (id) => setState((s) => {
       const ship = ships.find((x) => x.id === id)!;
       if (!s.unlockedShipIds.includes(id) || s.level < ship.requiredLevel || s.gold < ship.price || s.ownedShipIds.includes(id)) return s;
-      return claimAvailableAchievements({ ...s, gold: s.gold - ship.price, ownedShipIds: [...s.ownedShipIds, id] });
+      if (ship.questUnlock && !s.completedQuestIds.includes(ship.questUnlock)) return s;
+      if (!canAffordMaterials(s.materials, ship.materialCost ?? {})) return s;
+      return claimAvailableAchievements({ ...s, gold: s.gold - ship.price, materials: spendMaterials(s.materials, ship.materialCost ?? {}), ownedShipIds: [...s.ownedShipIds, id], discovered: { ...s.discovered, ships: Array.from(new Set([...s.discovered.ships, id])) } });
     }),
     equipShip: (id) => setState((s) => s.ownedShipIds.includes(id) ? { ...s, currentShipId: id, hp: getPower({ ...s, currentShipId: id }).maxHp } : s),
     buyEquipment: (id, type) => setState((s) => {
       const base = type === 'cannon' ? cannons.find((x) => x.id === id)! : type === 'harpoon' ? harpoons.find((x) => x.id === id)! : decks.find((x) => x.id === id)!;
-      if (base.price <= 0 || s.gold < base.price) return s;
-      return { ...s, gold: s.gold - base.price, equipment: [...s.equipment, makeEquipment(id, type)] };
+      if ('locked' in base && base.locked) return s;
+      const directAllowed = ['rusty-cannon', 'wooden-harpoon', 'beech-deck'].includes(id) || base.rarity === 'Event';
+      if (!directAllowed || base.price <= 0 || s.gold < base.price) return s;
+      const deckCost = type === 'deck' ? decks.find((x) => x.id === id)!.materialCost ?? {} : {};
+      if (type === 'deck' && !canAffordMaterials(s.materials, deckCost)) return s;
+      const item = makeEquipment(id, type);
+      return { ...s, gold: s.gold - base.price, materials: type === 'deck' ? spendMaterials(s.materials, deckCost) : s.materials, equipment: [...s.equipment, item] };
     }),
     equipEquipment: (id) => setState((s) => {
       const item = s.equipment.find((x) => x.instanceId === id);
@@ -166,11 +182,13 @@ export default function App() {
     }),
     upgradeEquipment: (id) => setState((s) => {
       const item = s.equipment.find((x) => x.instanceId === id);
-      if (!item || item.upgrade >= 10) return s;
+      if (!item || item.upgrade >= 5) return s;
       const cost = upgradeCost(item);
       if (s.gold < cost.gold || !canAffordMaterials(s.materials, cost.materials)) return s;
-      const equipment = s.equipment.map((x) => x.instanceId === id ? { ...x, upgrade: x.upgrade + 1 } : x);
-      return claimAvailableAchievements({ ...s, gold: s.gold - cost.gold, materials: spendMaterials(s.materials, cost.materials), equipment, stats: { ...s.stats, highestCannonUpgrade: item.type === 'cannon' ? Math.max(s.stats.highestCannonUpgrade, item.upgrade + 1) : s.stats.highestCannonUpgrade } });
+      const evolvedBaseId = item.upgrade + 1 >= 5 ? nextEvolution(item.type, item.baseId) : undefined;
+      const equipment = s.equipment.map((x) => x.instanceId === id ? { ...x, baseId: evolvedBaseId ?? x.baseId, upgrade: evolvedBaseId ? 0 : x.upgrade + 1 } : x);
+      const discoveredKey = item.type === 'cannon' ? 'cannons' : item.type === 'harpoon' ? 'harpoons' : 'decks';
+      return claimAvailableAchievements({ ...s, gold: s.gold - cost.gold, materials: spendMaterials(s.materials, cost.materials), equipment, discovered: evolvedBaseId ? { ...s.discovered, [discoveredKey]: Array.from(new Set([...s.discovered[discoveredKey], evolvedBaseId])) } : s.discovered, stats: { ...s.stats, highestCannonUpgrade: item.type === 'cannon' ? Math.max(s.stats.highestCannonUpgrade, item.upgrade + 1) : s.stats.highestCannonUpgrade } });
     }),
     claimQuest: (id) => setState((s) => {
       const quest = quests.find((q) => q.id === id)!;
@@ -186,6 +204,22 @@ export default function App() {
       if (coins < item.cost) return s;
       const type = id.includes('cannon') ? 'cannon' : id.includes('harpoon') ? 'harpoon' : 'deck';
       return { ...s, eventCurrency: { ...s.eventCurrency, [frozenFestival.id]: coins - item.cost }, equipment: [...s.equipment, makeEquipment(id, type)] };
+    }),
+    startExpedition: (id) => setState((s) => ({ ...s, activeExpeditions: [...s.activeExpeditions, { instanceId: `expedition-${Date.now()}-${Math.random().toString(16).slice(2)}`, expeditionId: id, startedAt: Date.now() }] })),
+    claimExpedition: (instanceId) => setState((s) => {
+      const active = s.activeExpeditions.find((item) => item.instanceId === instanceId);
+      if (!active) return s;
+      const expedition = expeditions.find((item) => item.id === active.expeditionId)!;
+      if (Date.now() - active.startedAt < expedition.durationMinutes * 60000) return s;
+      const crew = Math.random() < (expedition.rewards.crewChance ?? 0) ? crewMembers.find((member) => !s.crewIds.includes(member.id)) : undefined;
+      const equipment = Math.random() < (expedition.rewards.equipmentChance ?? 0) ? [makeEquipment('rusty-cannon', 'cannon')] : [];
+      return applyRewards({
+        ...s,
+        activeExpeditions: s.activeExpeditions.filter((item) => item.instanceId !== instanceId),
+        completedExpeditionIds: [...s.completedExpeditionIds, expedition.id],
+        crewIds: crew ? [...s.crewIds, crew.id] : s.crewIds,
+        equipment: [...s.equipment, ...equipment],
+      }, { gold: expedition.rewards.gold, materials: expedition.rewards.materials });
     }),
     save: () => saveGame(state),
     load: () => setState(loadGame()),
@@ -204,6 +238,9 @@ export default function App() {
     Shop: <Shop {...pageProps} />,
     Quests: <Quests {...pageProps} />,
     Inventory: <Inventory {...pageProps} />,
+    Collections: <Collections {...pageProps} />,
+    Crew: <Crew {...pageProps} />,
+    Expeditions: <Expeditions {...pageProps} />,
     Events: <Events {...pageProps} />,
     Settings: <Settings {...pageProps} />,
   };

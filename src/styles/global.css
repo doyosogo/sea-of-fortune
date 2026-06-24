@@ -316,6 +316,14 @@ select {
   font-weight: 900;
 }
 
+.logo-text {
+  text-transform: uppercase;
+  letter-spacing: 0;
+  color: #ffe9a6;
+  text-shadow: 0 1px 0 #4a2b16, 0 0 18px rgba(242,193,78,.34);
+  font-weight: 900;
+}
+
 .sidebar-collapse {
   width: 100%;
   margin-top: 18px;
@@ -824,6 +832,29 @@ select {
 
 .event-reward {
   border-color: rgba(231,251,255,.32);
+}
+
+.collection-grid, .crew-grid, .expedition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.collection-card, .crew-card, .expedition-card {
+  min-height: 180px;
+}
+
+.crew-card.locked {
+  filter: grayscale(.75);
+  opacity: .72;
+}
+
+.crew-card.owned {
+  border-color: rgba(242,193,78,.58);
+}
+
+.rarity-mythic {
+  background: linear-gradient(135deg, #111, #5d6472 45%, #e9f5ff);
 }
 
 @keyframes cloudDrift {

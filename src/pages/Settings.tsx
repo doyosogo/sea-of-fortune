@@ -6,7 +6,7 @@ export default function Settings({ state, actions }: PageProps) {
   const [name, setName] = useState(state.name);
   const [saveText, setSaveText] = useState('');
   return (
-    <SceneLayout scene="settings" title="Settings" kicker="Captain's desk" actions={<span className="pill">localStorage save</span>}>
+    <SceneLayout scene="settings" title="Settings" kicker="Sea of Fortune" actions={<span className="pill">localStorage save</span>}>
       <div className="grid two">
         <div className="card">
           <h2>Captain</h2>

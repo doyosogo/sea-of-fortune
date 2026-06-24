@@ -26,10 +26,10 @@ export const createInitialState = (): GameState => {
     xp: 0,
     gold: 650,
     diamonds: 0,
-    materials: { wood: 20, iron: 8, cloth: 10, gunpowder: 4, relics: 0 },
+    materials: { wood: 20, iron: 8, cloth: 10, gunpowder: 4, relics: 0, ghostEssence: 0, leviathanHeart: 0, krakenEye: 0 },
     currentShipId: 'old-dinghy',
     ownedShipIds: ['old-dinghy'],
-    unlockedShipIds: ['old-dinghy', 'coastal-sloop', 'raider-brig', 'war-brig', 'scout-frigate'],
+    unlockedShipIds: ['old-dinghy', 'coastal-sloop'],
     unlockedZoneIds: ['calm-coast'],
     selectedZoneId: 'calm-coast',
     equipment: [starterCannon, starterHarpoon, starterDeck],
@@ -39,7 +39,18 @@ export const createInitialState = (): GameState => {
     achievementIds: [],
     inventory: [],
     eventCurrency: { 'frozen-festival': 0 },
-    stats: { enemiesDefeated: 0, bossesDefeated: 0, goldEarned: 0, questsCompleted: 0, highestCannonUpgrade: 0 },
+    discovered: {
+      ships: ['old-dinghy'],
+      enemies: [],
+      materials: ['wood', 'iron', 'cloth', 'gunpowder'],
+      cannons: ['rusty-cannon'],
+      harpoons: ['wooden-harpoon'],
+      decks: ['beech-deck'],
+    },
+    crewIds: [],
+    activeExpeditions: [],
+    completedExpeditionIds: [],
+    stats: { enemiesDefeated: 0, bossesDefeated: 0, goldEarned: 0, questsCompleted: 0, highestCannonUpgrade: 0, rareDropsFound: 0, startedAt: Date.now() },
     lastSavedAt: Date.now(),
     lastOfflineZoneId: 'calm-coast',
     hp: 120,
@@ -90,6 +101,23 @@ export const applyRewards = (state: GameState, rewards: { gold?: number; xp?: nu
   return rewards.xp ? gainXp(next, rewards.xp) : next;
 };
 
+export const migrateState = (raw: Partial<GameState>): GameState => {
+  const initial = createInitialState();
+  const materials = { ...initial.materials, ...(raw.materials ?? {}) };
+  const stats = { ...initial.stats, ...(raw.stats ?? {}) };
+  const discovered = { ...initial.discovered, ...(raw.discovered ?? {}) };
+  return {
+    ...initial,
+    ...raw,
+    materials,
+    stats,
+    discovered,
+    crewIds: raw.crewIds ?? initial.crewIds,
+    activeExpeditions: raw.activeExpeditions ?? initial.activeExpeditions,
+    completedExpeditionIds: raw.completedExpeditionIds ?? initial.completedExpeditionIds,
+  };
+};
+
 export const claimAvailableAchievements = (state: GameState) => {
   let next = state;
   const hasFrigate = state.ownedShipIds.some((id) => id.includes('frigate'));
@@ -103,7 +131,13 @@ export const claimAvailableAchievements = (state: GameState) => {
       (achievement.check === 'quests10' && next.stats.questsCompleted >= 10) ||
       (achievement.check === 'boss1' && next.stats.bossesDefeated >= 1) ||
       (achievement.check === 'frozen' && next.unlockedZoneIds.includes('frozen-current')) ||
-      (achievement.check === 'level20' && next.level >= 20);
+      (achievement.check === 'level20' && next.level >= 20) ||
+      (achievement.check === 'enemies1000' && next.stats.enemiesDefeated >= 1000) ||
+      (achievement.check === 'gold10m' && next.stats.goldEarned >= 10000000) ||
+      (achievement.check === 'ships6' && next.ownedShipIds.length >= 6) ||
+      (achievement.check === 'crew3' && next.crewIds.length >= 3) ||
+      (achievement.check === 'collections25' && Object.values(next.discovered).reduce((sum, values) => sum + values.length, 0) >= 25) ||
+      (achievement.check === 'expeditions5' && next.completedExpeditionIds.length >= 5);
     if (passed) {
       next = applyRewards({ ...next, achievementIds: [...next.achievementIds, achievement.id] }, achievement.rewards);
     }

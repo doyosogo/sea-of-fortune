@@ -15,6 +15,9 @@ const resources = [
   { label: 'Cloth', icon: 'C', value: (state: GameState) => fmt(state.materials.cloth), tip: 'Cloth for sails and deck fittings.' },
   { label: 'Gunpowder', icon: 'P', value: (state: GameState) => fmt(state.materials.gunpowder), tip: 'Gunpowder for cannon upgrades.' },
   { label: 'Ancient Relics', icon: 'R', value: (state: GameState) => fmt(state.materials.relics), tip: 'Rare relics recovered from dangerous waters.' },
+  { label: 'Ghost Essence', icon: 'GE', value: (state: GameState) => fmt(state.materials.ghostEssence), tip: 'Legendary material from Ghostwater Abyss.' },
+  { label: 'Leviathan Heart', icon: 'LH', value: (state: GameState) => fmt(state.materials.leviathanHeart), tip: 'Legendary material from leviathan bosses.' },
+  { label: 'Kraken Eye', icon: 'KE', value: (state: GameState) => fmt(state.materials.krakenEye), tip: 'Future mythic world-boss material.' },
 ];
 
 export default function Layout({ state, page, setPage, children }: { state: GameState; page: Page; setPage: (page: Page) => void; children: ReactNode }) {

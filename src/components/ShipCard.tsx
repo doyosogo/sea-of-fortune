@@ -1,6 +1,8 @@
 import { Ship } from '../types/game';
 import { fmt } from '../utils/economy';
 
+const materialText = (cost?: Ship['materialCost']) => cost ? Object.entries(cost).filter(([, value]) => value).map(([key, value]) => `${fmt(value ?? 0)} ${key}`).join(', ') : 'None';
+
 export default function ShipCard({ ship, owned, unlocked, current, compareHp, onBuy, onEquip }: { ship: Ship; owned: boolean; unlocked: boolean; current: boolean; compareHp: number; onBuy: () => void; onEquip: () => void }) {
   return (
     <article className={`card ship-card ${!unlocked ? 'locked' : ''} ${current ? 'current' : ''}`} title={ship.description}>
@@ -19,6 +21,8 @@ export default function ShipCard({ ship, owned, unlocked, current, compareHp, on
         <span>Speed <b>{ship.speed}</b></span>
         <span>Price <b>{fmt(ship.price)}</b></span>
       </div>
+      <p className="reward-line">Materials: {materialText(ship.materialCost)}</p>
+      {ship.questUnlock && <p className="reward-line">Questline required: {ship.questUnlock}</p>}
       <p className={ship.hp >= compareHp ? 'positive' : 'negative'}>HP comparison: {ship.hp - compareHp >= 0 ? '+' : ''}{fmt(ship.hp - compareHp)}</p>
       <div className="button-row">
         {!owned && <button disabled={!unlocked} onClick={onBuy}>Buy {fmt(ship.price)}</button>}

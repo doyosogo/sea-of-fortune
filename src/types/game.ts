@@ -1,5 +1,5 @@
-export type Material = 'wood' | 'iron' | 'cloth' | 'gunpowder' | 'relics';
-export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legendary' | 'Event';
+export type Material = 'wood' | 'iron' | 'cloth' | 'gunpowder' | 'relics' | 'ghostEssence' | 'leviathanHeart' | 'krakenEye';
+export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legendary' | 'Event' | 'Mythic';
 export type Page =
   | 'Dashboard'
   | 'My Ship'
@@ -9,6 +9,9 @@ export type Page =
   | 'Shop'
   | 'Quests'
   | 'Inventory'
+  | 'Collections'
+  | 'Crew'
+  | 'Expeditions'
   | 'Events'
   | 'Settings';
 
@@ -18,6 +21,7 @@ export interface Ship {
   id: string;
   name: string;
   price: number;
+  materialCost?: Partial<Materials>;
   requiredLevel: number;
   hp: number;
   cannonSlots: number;
@@ -37,6 +41,8 @@ export interface Cannon {
   critChance: number;
   rarity: Rarity;
   price: number;
+  evolvesTo?: string;
+  locked?: boolean;
 }
 
 export interface Harpoon {
@@ -46,6 +52,8 @@ export interface Harpoon {
   monsterBonus: number;
   rarity: Rarity;
   price: number;
+  evolvesTo?: string;
+  locked?: boolean;
 }
 
 export interface Deck {
@@ -58,6 +66,9 @@ export interface Deck {
   repairEfficiency: number;
   rarity: Rarity;
   price: number;
+  materialCost?: Partial<Materials>;
+  evolvesTo?: string;
+  locked?: boolean;
 }
 
 export interface OwnedEquipment {
@@ -75,8 +86,42 @@ export interface Enemy {
   rewardGold: number;
   rewardXp: number;
   drops: Partial<Materials>;
+  lootTableId?: string;
   monster?: boolean;
   boss?: boolean;
+}
+
+export interface MaterialInfo {
+  id: Material;
+  name: string;
+  description: string;
+  icon: string;
+  dropSource: string;
+  rarity: Rarity;
+  dropRate?: string;
+}
+
+export interface CrewMember {
+  id: string;
+  name: string;
+  role: 'Gunner' | 'Navigator' | 'Carpenter' | 'Quartermaster' | 'Treasure Hunter';
+  quality: Exclude<Rarity, 'Event' | 'Mythic'>;
+  bonus: string;
+  description: string;
+}
+
+export interface ExpeditionDefinition {
+  id: string;
+  name: string;
+  durationMinutes: number;
+  description: string;
+  rewards: { gold: number; materials?: Partial<Materials>; equipmentChance?: number; crewChance?: number };
+}
+
+export interface ActiveExpedition {
+  instanceId: string;
+  expeditionId: string;
+  startedAt: number;
 }
 
 export interface Zone {
@@ -104,8 +149,9 @@ export interface Achievement {
   id: string;
   title: string;
   description: string;
+  category?: 'Combat' | 'Economy' | 'Collection' | 'Ships' | 'Crew' | 'Exploration';
   rewards: { gold?: number; diamonds?: number; materials?: Partial<Materials> };
-  check: 'enemies100' | 'gold100k' | 'frigate' | 'cannon5' | 'quests10' | 'boss1' | 'frozen' | 'level20';
+  check: string;
 }
 
 export interface PlayerStats {
@@ -114,6 +160,8 @@ export interface PlayerStats {
   goldEarned: number;
   questsCompleted: number;
   highestCannonUpgrade: number;
+  rareDropsFound: number;
+  startedAt: number;
 }
 
 export interface GameState {
@@ -135,6 +183,10 @@ export interface GameState {
   achievementIds: string[];
   inventory: string[];
   eventCurrency: Record<string, number>;
+  discovered: { ships: string[]; enemies: string[]; materials: Material[]; cannons: string[]; harpoons: string[]; decks: string[] };
+  crewIds: string[];
+  activeExpeditions: ActiveExpedition[];
+  completedExpeditionIds: string[];
   stats: PlayerStats;
   lastSavedAt: number;
   lastOfflineZoneId: string;
